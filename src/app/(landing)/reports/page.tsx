@@ -24,30 +24,39 @@ const Page = () => {
     enabled: !!selectedSubject,
   });
 
-  console.log(data);
-
   return (
-    <div className="h-full flex flex-col px-6">
+    <div className="h-full flex flex-col px-4 md:px-6 py-4">
       <PageTitle title="Reports" />
-      <Select onValueChange={setSelectedSubject}>
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select subjects" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Subject</SelectLabel>
-            {Object.keys(SUBJECTS).map((key: string) => {
-              return (
+
+      {/* Dropdown Section */}
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full max-w-md">
+        <label className="text-gray-700 font-medium">Select Subject:</label>
+        <Select onValueChange={setSelectedSubject}>
+          <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Select subjects" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Subject</SelectLabel>
+              {Object.keys(SUBJECTS).map((key: string) => (
                 <SelectItem value={key} key={key}>
                   {SUBJECTS[key as keyof typeof SUBJECTS]}
                 </SelectItem>
-              );
-            })}
-          </SelectGroup>
-        </SelectContent>
-      </Select>
-      <div className="flex-1 flex items-center justify-center">
-        {data && <BarChart data={data} />}
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Chart Section */}
+      <div className="flex-1 flex items-center justify-center w-full mt-6">
+        {data ? (
+          <div className="w-full max-w-3xl">
+            <BarChart data={data} />
+          </div>
+        ) : (
+          <p className="text-gray-500">Loading data...</p>
+        )}
       </div>
     </div>
   );

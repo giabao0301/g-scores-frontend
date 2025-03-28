@@ -33,80 +33,75 @@ export default function Page() {
     enabled: !!selectedGroup,
   });
 
-  console.log(data);
-
   return (
-    <div className="flex flex-col items-center justify-start h-screen">
-      <h1 className="text-4xl font-extrabold text-[#fed800] tracking-wider uppercase text-center p-4">
+    <div className="min-h-screen flex flex-col items-center p-4">
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-[#fed800] tracking-wider uppercase text-center">
         G-Scores
       </h1>
-      <h2 className="text-2xl font-bold text-gray-500">
+      <h2 className="text-lg sm:text-2xl font-bold text-gray-500 mt-2 text-center">
         Top {limit} students of group {selectedGroup}
       </h2>
-      <div className="flex items-center justify-start gap-8 mt-8 ml-8 self-start">
-        <label htmlFor="">Top:</label>
-        <Select onValueChange={setLimit}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select top" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Top</SelectLabel>
-              {Object.keys(TOP).map((key: string) => {
-                return (
+
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mt-6 w-full max-w-xl">
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+          <label className="text-sm sm:text-base font-medium">Top:</label>
+          <Select onValueChange={setLimit}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Select top" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Top</SelectLabel>
+                {Object.keys(TOP).map((key) => (
                   <SelectItem value={key} key={key}>
                     {TOP[key as keyof typeof TOP]}
                   </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-        <label htmlFor="">Group:</label>
-        <Select
-          onValueChange={(value) =>
-            setSelectedGroup(value as keyof typeof GROUPS)
-          }
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select group" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Group</SelectLabel>
-              {Object.keys(GROUPS).map((key: string) => {
-                return (
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+          <label className="text-sm sm:text-base font-medium">Group:</label>
+          <Select
+            onValueChange={(value) =>
+              setSelectedGroup(value as keyof typeof GROUPS)
+            }
+          >
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Select group" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Group</SelectLabel>
+                {Object.keys(GROUPS).map((key) => (
                   <SelectItem value={key} key={key}>
                     {key}: {GROUPS[key as keyof typeof GROUPS]}
                   </SelectItem>
-                );
-              })}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {isLoading &&
         Array.from({ length: 5 }).map((_, index) => (
-          <Skeleton
-            key={index}
-            className="flex justify-center p-4 mt-8 mx-8 w-[90%]"
-          />
+          <Skeleton key={index} className="h-10 w-full max-w-xl mt-4" />
         ))}
 
-      <div className="flex mt-12 justify-center w-full px-8">
+      <div className="mt-8 w-full max-w-5xl overflow-x-auto">
         {data && (
-          <Table>
+          <Table className="w-full">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[100px]">SBD</TableHead>
-                {GROUPS[selectedGroup].split(", ").map((subject: string) => {
-                  return (
-                    <TableHead className="text-center" key={subject}>
-                      {subject}
-                    </TableHead>
-                  );
-                })}
+                <TableHead className="w-[80px]">SBD</TableHead>
+                {GROUPS[selectedGroup].split(", ").map((subject) => (
+                  <TableHead key={subject} className="text-center">
+                    {subject}
+                  </TableHead>
+                ))}
                 <TableHead className="text-right">Tổng</TableHead>
               </TableRow>
             </TableHeader>
