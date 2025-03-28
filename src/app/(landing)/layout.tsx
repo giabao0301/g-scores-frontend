@@ -6,7 +6,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <AppSidebar />
       <main className="min-h-screen w-full bg-white text-black">
-        <SidebarTrigger className="cursor-pointer" />
+        <SidebarTrigger className="cursor-pointer p-8" />
         {children}
       </main>
     </SidebarProvider>
