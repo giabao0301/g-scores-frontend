@@ -11,18 +11,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SUBJECTS } from "@/constants";
-import { getScoreStats } from "@/services/scoreService";
+import { getResultStatsBySubject } from "@/services/resultService";
+import slugify from "@/utils/SlugConverter";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 const Page = () => {
-  const [selectedSubject, setSelectedSubject] = useState<string>("toan");
+  const [selectedSubject, setSelectedSubject] = useState<string>("mathematics");
 
   const { data } = useQuery({
     queryKey: ["reports", selectedSubject],
-    queryFn: () => getScoreStats(selectedSubject),
+    queryFn: () => getResultStatsBySubject(selectedSubject),
     enabled: !!selectedSubject,
   });
+
+  console.log("data", data);
 
   return (
     <div className="h-full flex flex-col px-4 md:px-6 py-4">
@@ -38,9 +41,9 @@ const Page = () => {
           <SelectContent>
             <SelectGroup>
               <SelectLabel>Subject</SelectLabel>
-              {Object.keys(SUBJECTS).map((key: string) => (
-                <SelectItem value={key} key={key}>
-                  {SUBJECTS[key as keyof typeof SUBJECTS]}
+              {SUBJECTS.map((subject: string) => (
+                <SelectItem value={slugify(subject)} key={subject}>
+                  {subject}
                 </SelectItem>
               ))}
             </SelectGroup>

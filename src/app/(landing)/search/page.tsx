@@ -9,23 +9,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getScoreByRegistrationNumber } from "@/services/scoreService";
-import { Score } from "@/types/score";
+import { getStudentByRegistrationNumber } from "@/services/studentService";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { SUBJECTS } from "@/constants";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Result } from "@/types/result";
 
 const Page = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const { data, isError, isLoading } = useQuery({
     queryKey: ["search", searchQuery],
-    queryFn: () => getScoreByRegistrationNumber(searchQuery),
+    queryFn: () => getStudentByRegistrationNumber(searchQuery),
     enabled: !!searchQuery,
     retry: false,
     refetchOnWindowFocus: false,
   });
+
+  const subjects = data?.results.map((result: Result) => result.subject);
 
   return (
     <div className="min-h-screen p-4">
@@ -45,25 +46,29 @@ const Page = () => {
             <Table className="w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[100px]">SBD</TableHead>
-                  {Object.values(SUBJECTS).map((value: string) => (
+                  <TableHead className="w-[100px]">RegNo</TableHead>
+                  {subjects?.map((value: string) => (
                     <TableHead className="text-center" key={value}>
                       {value}
                     </TableHead>
                   ))}
-                  <TableHead className="text-right">Mã ngoại ngữ</TableHead>
+                  <TableHead className="text-right">
+                    Foreign Language Code
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow>
-                  <TableCell className="font-medium">{data.sbd}</TableCell>
-                  {Object.keys(SUBJECTS).map((key: string) => (
-                    <TableCell className="text-center" key={key}>
-                      {data[key as keyof Score]}
+                  <TableCell className="font-medium">
+                    {data.registrationNumber}
+                  </TableCell>
+                  {data.results.map((result: Result) => (
+                    <TableCell className="text-center" key={result.subject}>
+                      {result.score || "N/A"}
                     </TableCell>
                   ))}
                   <TableCell className="text-right">
-                    {data.ma_ngoai_ngu}
+                    {data.foreignLanguageCode || "N/A"}
                   </TableCell>
                 </TableRow>
               </TableBody>

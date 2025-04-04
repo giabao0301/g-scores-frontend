@@ -17,21 +17,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { GROUPS, SUBJECTS, TOP } from "@/constants";
-import { getTopStudents } from "@/services/scoreService";
-import { TopStudent } from "@/types/score";
+import { GROUPS, TOP } from "@/constants";
+import { getTopStudents } from "@/services/studentService";
+import { Result } from "@/types/result";
+import { TopStudent } from "@/types/student";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export default function Page() {
   const [selectedGroup, setSelectedGroup] = useState<keyof typeof GROUPS>("A");
-  const [limit, setLimit] = useState<string>("10");
+  const [top, setTop] = useState<string>("10");
 
   const { data, isLoading } = useQuery({
-    queryKey: ["top", selectedGroup, limit],
-    queryFn: () => getTopStudents(selectedGroup, parseInt(limit)),
+    queryKey: ["top", selectedGroup, top],
+    queryFn: () => getTopStudents(selectedGroup, top),
     enabled: !!selectedGroup,
   });
+
+  const subjects = data?.[0]?.student.results.map(
+    (result: Result) => result.subject
+  );
 
   return (
     <div className="min-h-screen flex flex-col items-center p-4">
@@ -39,13 +44,13 @@ export default function Page() {
         G-Scores
       </h1>
       <h2 className="text-lg sm:text-2xl font-bold text-gray-500 mt-2 text-center">
-        Top {limit} students of group {selectedGroup}
+        Top {top} students of group {selectedGroup}
       </h2>
 
       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 mt-6 w-full max-w-xl">
         <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
           <label className="text-sm sm:text-base font-medium">Top:</label>
-          <Select onValueChange={setLimit}>
+          <Select onValueChange={setTop}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Select top" />
             </SelectTrigger>
@@ -96,39 +101,46 @@ export default function Page() {
           <Table className="w-full">
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[80px]">SBD</TableHead>
-                {GROUPS[selectedGroup].split(", ").map((subject) => (
-                  <TableHead key={subject} className="text-center">
-                    {subject}
+                <TableHead className="w-[100px]">RegNo</TableHead>
+                {subjects?.map((value: string) => (
+                  <TableHead className="text-center" key={value}>
+                    {value}
                   </TableHead>
                 ))}
-                <TableHead className="text-right">Tổng</TableHead>
+                <TableHead className="text-right">
+                  Foreign Language Code
+                </TableHead>
+                <TableHead className="text-right">Total</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.map((item: TopStudent) => (
-                <TableRow key={item.sbd}>
-                  <TableCell className="font-medium">{item.sbd}</TableCell>
-                  {GROUPS[selectedGroup].split(", ").map((subject) => {
-                    const dbField = Object.keys(SUBJECTS).find(
-                      (key) =>
-                        SUBJECTS[key as keyof typeof SUBJECTS] === subject
-                    ) as keyof TopStudent;
-                    return (
-                      <TableCell key={subject} className="text-center">
-                        {typeof item[dbField] === "number"
-                          ? item[dbField]
-                          : "N/A"}
+              {data.map((item: TopStudent) => {
+                const subjectScoreMap = new Map(
+                  item.student.results.map((result) => [
+                    result.subject,
+                    result.score,
+                  ])
+                );
+
+                return (
+                  <TableRow key={item.student.registrationNumber}>
+                    <TableCell className="font-medium">
+                      {item.student.registrationNumber}
+                    </TableCell>
+                    {subjects?.map((subject: string) => (
+                      <TableCell className="text-center" key={subject}>
+                        {subjectScoreMap.get(subject) || "N/A"}
                       </TableCell>
-                    );
-                  })}
-                  <TableCell className="text-right font-bold">
-                    {typeof item.total === "number"
-                      ? item.total.toFixed(2)
-                      : "N/A"}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    ))}
+                    <TableCell className="text-right">
+                      {item.student.foreignLanguageCode || "N/A"}
+                    </TableCell>
+                    <TableCell className="text-right font-bold">
+                      {item.totalScore}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         )}

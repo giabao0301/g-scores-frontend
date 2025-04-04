@@ -1,5 +1,5 @@
 "use client";
-import { ScoreRange } from "@/types/score";
+import { ResultStat } from "@/types/result";
 import React from "react";
 import {
   BarChart as BarGraph,
@@ -9,7 +9,7 @@ import {
   Bar,
 } from "recharts";
 
-export default function BarChart({ data }: { data: ScoreRange[] }) {
+export default function BarChart({ data }: { data: ResultStat[] }) {
   if (!data || data.length === 0) {
     return (
       <div className="text-center text-gray-500">Please select a subject</div>
@@ -41,7 +41,7 @@ export default function BarChart({ data }: { data: ScoreRange[] }) {
             tickFormatter={(value) => value}
           />
           <Bar
-            dataKey="total"
+            dataKey="totalStudents"
             radius={[4, 4, 0, 0]}
             barSize={window.innerWidth < 640 ? 30 : 50}
           />
